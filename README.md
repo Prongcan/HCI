@@ -2,73 +2,38 @@
 
 An image search web application built with **Gradio + Bailian Multimodal Embedding + Upstash Vector**, following the Five-Stage Search Framework. The dataset used is the [GroceryStoreDataset](https://github.com/marcusklasson/GroceryStoreDataset).
 
-## Requirements
+> **Fully cloud-based**: Embedding model (Bailian API) and vector database (Upstash Vector) are both cloud services. No local model deployment or database installation required.
 
-- Python 3.10+
-- Conda environment `genai-env`
-
-## Setup
-
-### 1. Create and activate the environment
+## Quick Start
 
 ```bash
+# 1. Create conda environment
 conda create -n genai-env python=3.12 -y
 conda activate genai-env
-```
 
-### 2. Install dependencies
+# 2. Install dependencies
+pip install gradio upstash-vector requests pillow
 
-```bash
-pip install gradio upstash-vector requests pillow openai
-```
-
-### 3. Clone the dataset
-
-```bash
+# 3. Clone the dataset into project root
 git clone https://github.com/marcusklasson/GroceryStoreDataset.git dataset
-```
 
-The `dataset/` folder should be at the same level as `app.py` and `build_index.py`.
-
-## Usage
-
-### Step 1: Build the Vector Index
-
-This step extracts image embeddings from all dataset images using the Bailian multimodal embedding API (`tongyi-embedding-vision-plus-2026-03-06`, 512-dim) and uploads them to the Upstash Vector index. **Run this once** before starting the app.
-
-```bash
-conda activate genai-env
+# 4. Build vector index (run once)
 python build_index.py
-```
 
-This will:
-- Scan all images in `dataset/dataset/train/` and `dataset/dataset/test/` (5,502 images total)
-- Extract 512-dim image embeddings via Bailian API (batched, 10 images per API call)
-- Upload vectors to Upstash Vector in batches
-
-> Note: This step requires internet access to reach the Bailian API and Upstash API.
-
-### Step 2: Launch the Gradio App
-
-```bash
-conda activate genai-env
+# 5. Launch the app
 python app.py
 ```
 
-Then open your browser and navigate to:
-
-```
-http://127.0.0.1:7860
-```
+Open http://127.0.0.1:7861 in your browser.
 
 ## Tech Stack
 
-| Component | Technology |
-|-----------|-----------|
-| Embedding Model | Bailian `tongyi-embedding-vision-plus-2026-03-06` (512-dim) |
-| Vector Database | Upstash Vector (512-dim, Cosine similarity) |
-| Frontend | Gradio |
-| Dataset | GroceryStoreDataset (5,502 images, 43 classes) |
+| Component | Technology | Cloud/Local |
+|-----------|-----------|-------------|
+| Embedding Model | Bailian `tongyi-embedding-vision-plus-2026-03-06` (512-dim) | Cloud API |
+| Vector Database | Upstash Vector (512-dim, Cosine similarity) | Cloud Service |
+| Frontend | Gradio | Local |
+| Dataset | GroceryStoreDataset (5,125 images, 43 classes) | Local files |
 
 ## Features (Five-Stage Search Framework)
 
@@ -88,10 +53,11 @@ HCI/
 ├── app.py              # Gradio web interface
 ├── build_index.py      # Data ingestion & embedding extraction
 ├── README.md           # This file
-├── favorites.json      # Saved favorites (auto-generated)
-└── dataset/            # GroceryStoreDataset (cloned from GitHub)
+├── .gitignore
+├── favorites.json      # Saved favorites (auto-generated, gitignored)
+└── dataset/            # GroceryStoreDataset (cloned separately, gitignored)
     └── dataset/
-        ├── train/
-        ├── test/
-        └── classes.csv
+        ├── train/      # 2,640 training images
+        ├── test/       # 2,485 test images
+        └── classes.csv # 43 fine-grained classes
 ```
